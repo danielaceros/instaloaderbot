@@ -17,7 +17,7 @@ pip/pip3 install python-telegram-bot
 # Telegram BOT
 You need to create a BOT on TELEGRAM, for this, you can chat to 'BotFather', then '/newbot', and follow the instructions, then, when you have created it, you need to copy the API KEY that BotFather gives to you and put it on the script, in the part of 'Updater('' #insert your BOT API KEY)'.
 Later, you have to add commands, for this, return to 'BotFather', '/mybots', select your bot, 'Edit Bot', 'Edit Commands', then you paste this list:
-"""
+```
 login - LOGIN [user] [password]
 posts - Get USER'S POSTS [user] [nº] [a/d](ascendent/descentent)
 postsdate -Get USER'S POSTS by DATE [user] [nº] [since(d/m/y)] [until(d/m/y)] [asc/desc](ascendent/descentent)
@@ -33,7 +33,7 @@ following - Get USER'S FOLLOWING [user] [nº]
 mutual - Get MUTUAL FOLLOWERS/FOLLOWING [user] [nº]
 similar - Get similar ACCOUNTS [user] [nº]
 clear- CLEAR all FILES
-"""
+```
 # Functions and Examples
 For all the functions except 'login' you have to be logged before. Then, there are some examples of using.
 *login - Auth on your account by the command, for example, '/login danielaceros 1234 (Login on user 'danielaceros' with password '1234')
