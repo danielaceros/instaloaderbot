@@ -9,7 +9,7 @@
 <a href="https://discord.gg/XTW52Kt"><img src="https://img.shields.io/discord/733027681184251937.svg?style=flat&label=Join%20Community&color=7289DA" alt="Join Community Badge"/></a>
 <a href="https://twitter.com/abhisheknaiidu" ><img src="https://img.shields.io/twitter/follow/abhisheknaiidu.svg?style=social" /> </a>
 <br></br>
- 
+<div style="text-align: right">
 # instaloaderbot
 A telegram bot who gets some informations and pics from Instagram. It can dowload everything like posts, highlights, stories and even more.
 
@@ -65,3 +65,4 @@ For all the functions except 'login' you have to be logged before. Then, there a
 * clear - Clear all DIRECTORIES of the FOLDER where the script is placed by the command, ```/clear```
 ## License
 [GPL](https://choosealicense.com/licenses/gpl-3.0/)
+</div>
