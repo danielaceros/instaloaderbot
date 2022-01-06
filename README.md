@@ -47,10 +47,11 @@ similar - Get similar ACCOUNTS [user] [nº]
 clear - CLEAR all FILES
 ```
 ## Running CODE
-When you have created the BOT, installed the packages, and gived to the '.py' your API TOKEN, you can run the code by a IDE or PowerShell/CommandPrompt by:
+When you have created the BOT, installed the packages, and gived to the '.py' your API TOKEN, you can run the code by an IDE or PowerShell/CommandPrompt by:
 ```bash
 python instaloaderbot.py
 python3 instaloaderbot.py
+```
 ## Functions and Examples
 For all the functions except 'login' you have to be logged before. Then, there are some examples of the usage of Telegram Commands.
 * login - Auth on your account by the command, for example, ```/login danielaceros 1234``` (Login on user 'danielaceros' with password '1234')
