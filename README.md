@@ -3,16 +3,16 @@ A telegram bot who gets some informations and pics from Instagram. It can dowloa
 
 # Getting Started
 First of all, you should dowload de repo, or even de script, 'instaloader.py' and put it in an empty folder. Later, you should install the needed modules, via 'pip/pip3 install'
-'''
-* pip/pip3 install instaloader
-* pip/pip3 install logging
-* pip/pip3 install os
-* pip/pip3 install requests
-* pip/pip3 install shutil
-* pip/pip3 install instaloader
-* pip/pip3 install pandas
-* pip/pip3 install itertools
-* pip/pip3 install python-telegram-bot
+'''python
+pip/pip3 install instaloader
+pip/pip3 install logging
+pip/pip3 install os
+pip/pip3 install requests
+pip/pip3 install shutil
+pip/pip3 install instaloader
+pip/pip3 install pandas
+pip/pip3 install itertools
+pip/pip3 install python-telegram-bot
 '''
 # Telegram BOT
 You need to create a BOT on TELEGRAM, for this, you can chat to 'BotFather', then '/newbot', and follow the instructions, then, when you have created it, you need to copy the API KEY that BotFather gives to you and put it on the script, in the part of 'Updater('' #insert your BOT API KEY)'.
