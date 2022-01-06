@@ -52,4 +52,4 @@ For all the functions except 'login' you have to be logged before. Then, there a
 * similar - Get the LIST of SIMILAR ACCOUNT of an USER by the command, for example ```/similar dani 10``` (Get 10 accounts similar to the user 'dani')
 * clear - Clear all DIRECTORIES of the FOLDER where the script is placed by the command, ```/clear```
 ## License
-[GNU](https://choosealicense.com/licenses/gpl-3.0/)
+[GPL](https://choosealicense.com/licenses/gpl-3.0/)
