@@ -42,4 +42,12 @@ For all the functions except 'login' you have to be logged before. Then, there a
 * top - Get TOP POSTS of an USER by the command, for example '/top dani 20' (Get the 20% photos more liked from user 'dani')
 * profilepic - Get the PROFILE PIC of an USER by the command, for example '/profilepic dani' (Get the profile pic of 'dani)
 * stories - Get the STORIES of an USER by the command, for example '/stories dani' (Gets the stories of the user 'dani')
-* highlights - Get the HIGHLIGHTS of an USER by the command, for example '/highlights dani' (Get the highlights of the user 'dani')
+* highlights - Get the HIGHLIGHTS of an USER by the command, for example '/highlights dani 10' (Get 10 highlights of the user 'dani')
+* tagged - Get the TAGGED PHOTOS of an USER by the command, for example '/tagged dani 10' (Get 10 tagged photos of the user 'dani')
+* story - Get the STORIES from the FEED of LOGGED USER by the command, for example '/story 10' (Get 10 stories of feed)
+* feed - Get the FEED of LOGGED USER by the command, for example '/feed 10' (Get 10 feed posts of feed)
+* followers - Get the LIST of FOLLOWERS of an USER by the command, for example '/followers dani 10' (Get 10 followers of the user 'dani')
+* following - Get the LIST of FOLLOWING of an USER by the command, for example '/following dani 10' (Get 10 followees of the user 'dani')
+* mutual - Get the LIST of FOLLOWERS - FOLLOWING of an USER by the command, for example '/mutual dani 10' (Get 10 mutual followings of the user 'dani')
+* similar - Get the LIST of SIMILAR ACCOUNT of an USER by the command, for example '/similar dani 10' (Get 10 accounts similar to the user 'dani')
+* clear - Clear all DIRECTORIES of the FOLDER where the script is placed by the command, '/clear'
