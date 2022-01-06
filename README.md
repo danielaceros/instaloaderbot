@@ -51,3 +51,5 @@ For all the functions except 'login' you have to be logged before. Then, there a
 * mutual - Get the LIST of FOLLOWERS - FOLLOWING of an USER by the command, for example ```/mutual dani 10``` (Get 10 mutual followings of the user 'dani')
 * similar - Get the LIST of SIMILAR ACCOUNT of an USER by the command, for example ```/similar dani 10``` (Get 10 accounts similar to the user 'dani')
 * clear - Clear all DIRECTORIES of the FOLDER where the script is placed by the command, ```/clear```
+## License
+[GNU](https://choosealicense.com/licenses/gpl-3.0/)
