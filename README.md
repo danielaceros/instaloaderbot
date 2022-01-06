@@ -22,7 +22,7 @@ login - LOGIN [user] [password]
 posts - Get USER'S POSTS [user] [nº] [a/d](ascendent/descentent)
 postsdate -Get USER'S POSTS by DATE [user] [nº] [since(d/m/y)] [until(d/m/y)] [asc/desc](ascendent/descentent)
 top - Get TOP POST of USER [user] [nº]
-profilepic -Get PROFILE PIC of an USER [user]
+profilepic - Get PROFILE PIC of an USER [user]
 stories -Get an USER STORY [user]
 highlights - Get USER'S HIGHLIGHTS [user] [nº]
 tagged - Get tagged POSTS of an USER [user] [nº]
@@ -32,10 +32,14 @@ followers - Get USER'S FOLLOWERS [user] [nº]
 following - Get USER'S FOLLOWING [user] [nº]
 mutual - Get MUTUAL FOLLOWERS/FOLLOWING [user] [nº]
 similar - Get similar ACCOUNTS [user] [nº]
-clear- CLEAR all FILES
+clear - CLEAR all FILES
 ```
 # Functions and Examples
 For all the functions except 'login' you have to be logged before. Then, there are some examples of using.
 *login - Auth on your account by the command, for example, '/login danielaceros 1234 (Login on user 'danielaceros' with password '1234')
 *posts - Get an USER'S POSTS by te command, for example, '/posts dani 10 a' (Get 10 posts of the user 'dani' by ascendent way)
-*postsdate - Get an USER'S POSTS by DATE by the command, for example
+*postsdate - Get an USER'S POSTS by DATE by the command, for example, '/postsdate dani 10 1/1/2022 1/1/2020 a' (Get 10 posts of the user 'dani' from 2022 to 2020 by ascendent). Important that since > until, instead, first date > second date.
+*top - Get TOP POSTS of an USER by the command, for example '/top dani 20' (Get the 20% photos more liked from user 'dani')
+*profilepic - Get the PROFILE PIC of an USER by the command, for example '/profilepic dani' (Get the profile pic of 'dani)
+*stories - Get the STORIES of an USER by the command, for example '/stories dani' (Gets the stories of the user 'dani')
+*highlights - Get the HIGHLIGHTS of an USER by the command, for example '/highlights dani' (Get the highlights of the user 'dani')
