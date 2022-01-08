@@ -1,12 +1,14 @@
 import instaloader
+from instaloader import Profile
 import os
 import os.path
 import logging
 import shutil
+import psutil
 from instaloader.instaloadercontext import RateController
 import requests
 import pandas as pd
-from instaloader import Profile
+from telegram.ext.dispatcher import run_async
 from itertools import dropwhile, takewhile
 from datetime import datetime
 from math import ceil
@@ -17,18 +19,20 @@ from telegram.ext.dispatcher import Dispatcher
 from telegram.update import Update
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.bot import Bot
-from instaloader import Profile
+logging.basicConfig(level=logging.DEBUG)
 logging.debug('This is a debug message')
 logging.info('This is an info message')
 logging.warning('This is a warning message')
 logging.error('This is an error message')
 logging.critical('This is a critical message')
 agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.57 Safari/537.36 Edg/91.0.864.27'
-updater = Updater("", # put your BOT API KEY
+updater = Updater("", # enter your API TOKEN
                   use_context=True)
 dispatcher: Dispatcher = updater.dispatcher
-global L
-L = instaloader.Instaloader(download_pictures=True, # change options if u want
+def login(update: Update, context: CallbackContext): # login stuff /login [user] [password]
+    try:
+        global L
+        L = instaloader.Instaloader(download_pictures=True,
         download_videos=False, 
         download_video_thumbnails=False,
         compress_json=False, 
@@ -39,9 +43,6 @@ L = instaloader.Instaloader(download_pictures=True, # change options if u want
         save_metadata=False,
         storyitem_metadata_txt_pattern=None,
         user_agent=agent)
-
-def login(update: Update, context: CallbackContext):
-    try:
         bot: Bot = context.bot
         user = context.args[0].lower()
         passw = context.args[1]
@@ -55,8 +56,7 @@ def login(update: Update, context: CallbackContext):
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                             text="\U0001F534 ¡Incorrect user/password, CHECK IT, and, TRY AGAIN!, '@{}'".format(user))
-
-def postsdate(update: Update, context: CallbackContext):
+def postsdate(update: Update, context: CallbackContext): # gets the PICS of an USER by DATE /postsdate [user] [nº] [since(d/m/y)] [until(d/m/y)] [(a)sc/(d)sc], always since > until
     try:
         bot: Bot = context.bot
         n = int(context.args[1])
@@ -115,14 +115,15 @@ def postsdate(update: Update, context: CallbackContext):
                     x = x + 1
                 else:
                     break
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} POSTED PICS of '@{}' from {} to {}".format(n2, user, SINCE, UNTIL))
     except Exception:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting POSTED PICS \U000026D4")
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting POSTED PICS \U000026D4")
-
-def profilepics(update: Update, context: CallbackContext):
+def profilepics(update: Update, context: CallbackContext): # gets the PICS of an USER /profilepics [user] [nº] [(a)sc/(d)sc]
     try:
         bot: Bot = context.bot
         n = int(context.args[1])
@@ -176,11 +177,12 @@ def profilepics(update: Update, context: CallbackContext):
                     x = x + 1
                 else:
                     break
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} POSTED PICS of '@{}'".format(n2, user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting POSTED PICS \U000026D4")
-
-def highlights(update: Update, context: CallbackContext):
+def highlights(update: Update, context: CallbackContext): # gets the HIGHLIGHTS of an USER /highlights [user] [nº]
     try:
         bot: Bot = context.bot
         n = int(context.args[1])
@@ -192,6 +194,7 @@ def highlights(update: Update, context: CallbackContext):
         bot.send_message(chat_id=update.effective_chat.id,
                             text="\U0001F916 ¡Getting {} HIGHLIGHTS! of '@{}', this may take a WHILE...".format(n2, user))
         y = 0
+        s = True
         for highlight in L.get_highlights(user=profile):
             for item in highlight.get_items():
                 if n != 0:
@@ -202,7 +205,7 @@ def highlights(update: Update, context: CallbackContext):
                         pass
                     L.download_storyitem(item, '{}stories'.format(highlight.owner_username))
                     y = y + 1
-                else:
+                elif n == 0:
                     L.download_storyitem(item, '{}stories'.format(highlight.owner_username))
             if s == False:
                 break
@@ -218,11 +221,12 @@ def highlights(update: Update, context: CallbackContext):
                 x = x + 1
             else:
                 break
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} HIGHLIGHTS of '@{}'".format(n2, user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting HIGHLIGHTS \U000026D4")
-
-def stories(update: Update, context: CallbackContext):
+def stories(update: Update, context: CallbackContext): # gets the stories of a CURRENT USER /stories [nº]
     try:
         bot: Bot = context.bot
         n = int(context.args[0])
@@ -252,11 +256,12 @@ def stories(update: Update, context: CallbackContext):
                 x = x + 1
             else:
                 break
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} STORIES from USER".format(n))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting STORIES from USER \U000026D4")
-
-def feed(update: Update, context: CallbackContext):
+def feed(update: Update, context: CallbackContext): # gets the USER FEED /feed [nº]
     try:
         bot: Bot = context.bot
         n = int(context.args[0])
@@ -285,14 +290,18 @@ def feed(update: Update, context: CallbackContext):
                 x = x + 1
             else:
                 break
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} FEED from USER".format(n))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting FEED from USER \U000026D4")
-
-def followers(update: Update, context: CallbackContext):
+def followers(update: Update, context: CallbackContext): # gets the FOLLOWERS of an USER /followers [user] [nº]
     try:
         bot: Bot = context.bot
         n = int(context.args[1])
+        n2 = n
+        if n == 0:
+            n2 = "ALL"
         user = context.args[0].lower()
         profile = Profile.from_username(L.context, user)
         bot.send_message(chat_id=update.effective_chat.id,
@@ -309,14 +318,18 @@ def followers(update: Update, context: CallbackContext):
                 bot.send_message(chat_id=update.effective_chat.id,
                                         text="\U0001F916 [{}] '{}'".format(x, followee.username))
                 x = x + 1
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} USER FOLLOWERS from '@{}'".format(n2, user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting USER FOLLOWERS \U000026D4")
-
-def following(update: Update, context: CallbackContext):
+def following(update: Update, context: CallbackContext): # gets the FOLLOWEES of an USER /following [user] [nº]
     try:
         bot: Bot = context.bot
         n = int(context.args[1])
+        n2 = n
+        if n == 0:
+            n2 = "ALL"
         user = context.args[0].lower()
         profile = Profile.from_username(L.context, user)
         bot.send_message(chat_id=update.effective_chat.id,
@@ -333,51 +346,48 @@ def following(update: Update, context: CallbackContext):
                 bot.send_message(chat_id=update.effective_chat.id,
                                         text="\U0001F916 [{}] '{}'".format(x, followee.username))
                 x = x + 1
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} USER FOLLOWEES from '@{}'".format(n2, user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting USER FOLLOWEES \U000026D4")
-
-def mutual(update: Update, context: CallbackContext):
+def mutual(update: Update, context: CallbackContext): # gets the mutual followers /mutual [user] [nº]
     try:
         bot: Bot = context.bot
         n = int(context.args[1])
+        n2 = n
+        if n == 0:
+            n2 = "ALL"
         user = context.args[0].lower()
         profile = Profile.from_username(L.context, user)
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U0001F916 ¡Getting USER MUTUAL! of '@{}', this may take a WHILE...".format(user))
         followees = set()
-        x = 1
         for followee in profile.get_followers():
-            if n != 0:
-                if x > n:
-                    break
-                followees.add(followee.username)
-                x = x + 1
-            else:
-                followees.add(followee.username)
-                x = x + 1
+            followees.add(followee.username)
+
         followers = set()
-        y = 1
         for follower in profile.get_followees():
-            if n != 0:
-                if x > n:
-                    break
-                followers.add(follower.username)
-                y = y + 1
-            else:
-                followers.add(follower.username)
-                y = y + 1
+            followers.add(follower.username)
+
         mutual = set.intersection(followees, followers)
         z = 1
         for m in mutual:
-            bot.send_message(chat_id=update.effective_chat.id,
+            if n != 0:
+                if z > n:
+                    break
+                bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U0001F916 [{}] '@{}'".format(z, m))
-            z = z + 1
+                z = z + 1
+            elif n == 0:
+                bot.send_message(chat_id=update.effective_chat.id,
+                                text="\U0001F916 [{}] '@{}'".format(z, m))
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} USER MUTUALS from '@{}'".format(n2, user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting USER MUTUAL \U000026D4")
-
-def profilepic(update: Update, context: CallbackContext):
+def profilepic(update: Update, context: CallbackContext): # gets the profile pic of an USER /profilepic [user]
     try:
         bot: Bot = context.bot
         user = context.args[0].lower()
@@ -394,11 +404,12 @@ def profilepic(update: Update, context: CallbackContext):
         else:
             bot.send_photo(chat_id=update.effective_chat.id,
                                     photo=open('{}profile/{}_profilepic.jpg'.format(user, user), 'rb'))      
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted PROFILE PIC from '@{}'".format(user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting PROFILE PIC \U000026D4")
-
-def story(update: Update, context: CallbackContext):
+def story(update: Update, context: CallbackContext): # gets stories of an USER /stories [user] [nº]
     try:
         bot: Bot = context.bot
         user = context.args[0].lower()
@@ -414,11 +425,12 @@ def story(update: Update, context: CallbackContext):
             else:
                 bot.send_photo(chat_id=update.effective_chat.id,
                                         photo=open('{}story/{}'.format(user, file), 'rb'))
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted STORIES from '@{}'".format(user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting STORIES \U000026D4")
-
-def tagged(update: Update, context: CallbackContext):
+def tagged(update: Update, context: CallbackContext): # get TAGGED PICS of an USER /tagged [user] [nº]
     try:
         bot: Bot = context.bot
         user = context.args[0].lower()
@@ -450,11 +462,12 @@ def tagged(update: Update, context: CallbackContext):
                 else:
                     bot.send_photo(chat_id=update.effective_chat.id,
                                             photo=open('{}tagged/{}'.format(user, file), 'rb'))
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} TAGGED from '@{}'".format(n2, user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting TAGGED \U000026D4")
-
-def top(update: Update, context: CallbackContext):
+def top(update: Update, context: CallbackContext): # gets TOP PICS of an USER /top [user] [nº]
     try:
         bot: Bot = context.bot
         user = context.args[0].lower()
@@ -479,11 +492,12 @@ def top(update: Update, context: CallbackContext):
             else:
                 bot.send_photo(chat_id=update.effective_chat.id,
                                 photo=open('{}top/{}'.format(user, file), 'rb'))
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} % MOST LIKED from '@{}'".format(n, user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting % MOST LIKED \U000026D4")
-
-def similar(update: Update, context: CallbackContext):
+def similar(update: Update, context: CallbackContext): # gets similar ACCOUNTS /similar [user] [nº]
     try:
         bot: Bot = context.bot
         user = context.args[0].lower()
@@ -506,54 +520,172 @@ def similar(update: Update, context: CallbackContext):
                 bot.send_message(chat_id=update.effective_chat.id,
                                         text="\U0001F916 [{}] '{}'".format(x, followee.username))
                 x = x + 1
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} SIMILAR from '@{}'".format(n2, user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while getting SIMILAR USERS \U000026D4")
-
-def clear(update: Update, context: CallbackContext):
+def clear(update: Update, context: CallbackContext): # ¡CAUTION! erase all directories in the script.py, by /clear [nameofile]
     try:
         bot: Bot = context.bot
-        dirs = [d for d in os.listdir('/home/pi/bot') if os.path.isdir(os.path.join('/home/pi/bot', d))]
-        for dir in dirs:
-            shutil.rmtree(dir)
-        bot.send_message(chat_id=update.effective_chat.id,
-                            text="\U0001F916 ¡ALL FILES ERASED!...")
+        user = context.args[0].lower()
+        if user == "0":
+            dirs = [d for d in os.listdir('.') if os.path.isdir(os.path.join('.', d))]
+            for dir in dirs:
+                shutil.rmtree(dir)
+            bot.send_message(chat_id=update.effective_chat.id,
+                                text="\U0001F916 ¡ALL FILES ERASED!...")
+        elif user != "0":
+            shutil.rmtree('{}'.format(user))
+            bot.send_message(chat_id=update.effective_chat.id,
+                                text="\U0001F916 ¡ALL FILES ERASED! from '{}'...".format(user))
     except:
         bot.send_message(chat_id=update.effective_chat.id,
                                 text="\U000026D4 FATAL ERROR, while CLEANING \U000026D4")
+def status(update: Update, context: CallbackContext): # gets INSTAGRAM status logged/not logged in
+    try:
+        bot: Bot = context.bot
+        status = L.test_login()
+        if status != None:
+            bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡LOGGED IN! as '@{}'".format(status))
+        else:
+            bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F534 ¡NOT LOGEED IN, CHECK IT, and TRY AGAIN!")
+    except:
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F534 ¡NOT LOGEED IN, CHECK IT, and TRY AGAIN!")
+def dir(update: Update, context: CallbackContext): # list dirs on the SERVER and gets FREE DISK SPACE
+    try:
+        bot: Bot = context.bot
+        dirs = [d for d in os.listdir('.') if os.path.isdir(os.path.join('.', d))]
+        x = 1
+        sizes = []
+        for dir in dirs:
+            filesize = []
+            for file in os.listdir('{}'.format(dir)):
+                filesize.append(os.path.getsize('{}/{}'.format(dir, file)))
+            size = round(float(sum(filesize))/float(1024*1024), 2)
+            sizes.append(size)
+            bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F916 [{}] '{}' | {} MB".format(x, dir, size))
+            x = x + 1
 
-if __name__ == '__main__':
+        path = '/'
+        ava = (psutil.disk_usage(path).free) / 1024 / 1024
+        to = (psutil.disk_usage(path).total) / 1024 / 1024
+        us = (psutil.disk_usage(path).used) / 1024 / 1024
+        
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="""\U0001F916 TOTAL: {} MB
+      USED: {} MB
+      FREE: {} MB
+      DIR: {} MB""".format(round(to,2), round(us,2), round(ava,2), round(sum(sizes),2)))
+    except:
+        bot.send_message(chat_id=update.effective_chat.id,
+                                text="\U000026D4 FATAL ERROR, while LISTING DIRS \U000026D4")
+def exit(update: Update, context: CallbackContext): # exits
+    try:
+        bot: Bot = context.bot
+        profilepics.terminate()
+        highlights.terminate()
+        stories.terminate()
+        feed.terminate()
+        clear.terminate()
+        login.terminate()
+        followers.terminate()
+        following.terminate()
+        profilepic.terminate()
+        stories.terminate()
+        tagged.terminate()
+        top.terminate()
+        similar.terminate()
+        postsdate.terminate()
+        status.terminate()
+        dir.terminate()
+    except:
+        pass
+def saved(update: Update, context: CallbackContext): # gets files DOWNLOADED YET /status [nameofile] [nº/0] [(a)sc/(d)esc]
+    try:
+        bot: Bot = context.bot
+        name = context.args[0].lower()
+        n = int(context.args[1])
+        n2 = n
+        rev = context.args[2].lower()
+        if n == 0:
+            n2 = "ALL"
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F916 ¡Getting {} SAVED PICS!, on {}, this may take a WHILE...".format(n2, name))
+        x = 1
+        if rev == "a":
+            for file in sorted(os.listdir('{}'.format(name)), reverse=False):
+                if n == 0:
+                    bot.send_photo(chat_id=update.effective_chat.id,
+                                photo=open("{}/{}".format(name, file), 'rb'))
+
+                elif n >= x:
+                    bot.send_photo(chat_id=update.effective_chat.id,
+                                photo=open("{}/{}".format(name, file), 'rb'))
+                    x = x + 1
+                else:
+                    break
+        elif rev == "d":
+            for file in sorted(os.listdir('{}'.format(name)), reverse=True):
+                if n == 0:
+                    bot.send_photo(chat_id=update.effective_chat.id,
+                                photo=open("{}/{}".format(name, file), 'rb'))
+
+                elif n >= x:
+                    bot.send_photo(chat_id=update.effective_chat.id,
+                                photo=open("{}/{}".format(name, file), 'rb'))
+                    x = x + 1
+                else:
+                    break
+        bot.send_message(chat_id=update.effective_chat.id,
+                            text="\U0001F7E2 ¡FINISHED!, getted {} SAVED PICS from '@{}'".format(n2, name))
+    except:
+        bot.send_message(chat_id=update.effective_chat.id,
+                                text="\U000026D4 FATAL ERROR, while getting SAVED PICS \U000026D4")
+if __name__ == '__main__': # starting stuff and commands for TELEGRAM BOT
     try:
         dispatcher.add_handler(
-            CommandHandler("posts", profilepics))
+            CommandHandler("posts", profilepics, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("highlights", highlights))
+            CommandHandler("highlights", highlights, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("story", stories))
+            CommandHandler("story", stories, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("feed", feed))
+            CommandHandler("feed", feed, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("clear", clear))
+            CommandHandler("clear", clear, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("login", login))
+            CommandHandler("login", login, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("followers", followers))
+            CommandHandler("followers", followers, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("following", following))
+            CommandHandler("following", following, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("mutual", mutual))
+            CommandHandler("mutual", mutual, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("profilepic", profilepic))
+            CommandHandler("profilepic", profilepic, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("stories", story))
+            CommandHandler("stories", stories, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("tagged", tagged))
+            CommandHandler("tagged", tagged, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("top", top))
+            CommandHandler("top", top, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("similar", similar))
+            CommandHandler("similar", similar, run_async=True))
         dispatcher.add_handler(
-            CommandHandler("postsdate", postsdate))
-        updater.start_polling() 
+            CommandHandler("postsdate", postsdate, run_async=True))
+        dispatcher.add_handler(
+            CommandHandler("status", status, run_async=True))
+        dispatcher.add_handler(
+            CommandHandler("dir", dir, run_async=True))
+        dispatcher.add_handler(
+            CommandHandler("exit", exit, run_async=True))
+        dispatcher.add_handler(
+            CommandHandler("saved", saved, run_async=True))
+        updater.start_polling()
     except:
         pass
